@@ -81,4 +81,8 @@ if __name__ == "__main__":
     N = 40  # número de cidades
     tsp = TSP()
     cities = tsp.generate_cities(N)
-    cost, tour, delta_t = tsp.solve_tsp_gurobi(cities)
+    D = tsp.build_distance_matrix(cities, list=True)
+    cost, tour, delta_t = tsp.solve_tsp_gurobi(D)
+    print(f"Custo da rota: {cost}")
+    print(f"Rota: {tour}")
+    print(f"Tempo de execução: {delta_t} segundos")
