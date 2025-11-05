@@ -73,12 +73,13 @@ class ImprovementHeuristics:
         new_tour = tour[:]
         n = len(new_tour)
         i, j = sorted(random.sample(range(1, n - 1), 2))
-        
-        # Pequena perturbação: inverter subsegmento ou trocar duas cidades
+        # aumentar chance de perturbação mais forte
         if random.random() < 0.5:
             new_tour[i:j] = reversed(new_tour[i:j])
         else:
-            new_tour[i], new_tour[j] = new_tour[j], new_tour[i]
+            for _ in range(3):  # faz múltiplas trocas aleatórias
+                a, b = random.sample(range(1, n - 1), 2)
+                new_tour[a], new_tour[b] = new_tour[b], new_tour[a]
         return new_tour
 
     # -------------------------------------
