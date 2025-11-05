@@ -118,7 +118,7 @@ if __name__ == "__main__":
     from tsp import TSP
     from heuristics import ConstructiveHeuristics
 
-    N = 20
+    N = 40
     num_iteracoes = 10  # ← você pode alterar aqui
 
     tsp = TSP()
@@ -130,11 +130,11 @@ if __name__ == "__main__":
 
 
     #Selecionar qual heurística construtiva usar
-    tour_nn = heur.farthest_insertion(D)
+    tour_nn = heur.cheapest_insertion(D)
     cost_nn = heur.tour_length(tour_nn, D)
     print(f"Custo inicial (NN): {cost_nn:.2f}")
 
-    # Aplicar busca iterada (2-opt com perturbação)
+    # Aplicar busca iterada (3-opt com perturbação)
     tour_final, cost_final = improver.iterated_improvement(
         tour_nn, D, heuristic="three_opt", num_iteracoes=num_iteracoes
     )
