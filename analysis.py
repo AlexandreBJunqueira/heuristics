@@ -4,8 +4,7 @@ import time
 import csv
 import matplotlib.pyplot as plt
 import pandas as pd
-from heuristics import ConstructiveHeuristics
-from heuristica_melhoria import ImprovementHeuristics
+from heuristics import ConstructiveHeuristics, ImprovementHeuristics
 from tsp import TSP
 
 
