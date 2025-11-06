@@ -69,7 +69,7 @@ class ImprovementHeuristics:
     # -------------------------------------
     # 3) Pequena perturbação aleatória
     # -------------------------------------
-    def perturbation(self, tour: List[int]) -> List[int]:
+    """ def perturbation(self, tour: List[int]) -> List[int]:
         new_tour = tour[:]
         n = len(new_tour)
         i, j = sorted(random.sample(range(1, n - 1), 2))
@@ -80,6 +80,41 @@ class ImprovementHeuristics:
             for _ in range(3):  # faz múltiplas trocas aleatórias
                 a, b = random.sample(range(1, n - 1), 2)
                 new_tour[a], new_tour[b] = new_tour[b], new_tour[a]
+        return new_tour """
+    
+
+    def perturbation(self, tour: List[int]) -> List[int]:
+        """
+        Gera uma perturbação moderada/forte para escapar de ótimos locais.
+        Combina reversões, remoções e reinserções aleatórias de cidades.
+        """
+        new_tour = tour[:]
+        n = len(new_tour)
+
+        # 1️⃣ - Decide a intensidade (5% a 20% do tamanho do tour)
+        k = max(2, int(0.1 * n + random.random() * 0.1 * n))
+
+        # 2️⃣ - Escolhe aleatoriamente k cidades para remover
+        removed_indices = sorted(random.sample(range(1, n - 1), k), reverse=True)
+        removed_cities = [new_tour[i] for i in removed_indices]
+        for idx in removed_indices:
+            del new_tour[idx]
+
+        # 3️⃣ - Reinsere as cidades removidas em posições aleatórias
+        for city in removed_cities:
+            pos = random.randint(1, len(new_tour) - 1)
+            new_tour.insert(pos, city)
+
+        # 4️⃣ - Opcional: aplica uma reversão aleatória em um segmento grande
+        if random.random() < 0.7:
+            i, j = sorted(random.sample(range(1, n - 1), 2))
+            new_tour[i:j] = reversed(new_tour[i:j])
+
+        # 5️⃣ - Pequenas trocas adicionais (ruído extra)
+        for _ in range(random.randint(1, 4)):
+            a, b = random.sample(range(1, n - 1), 2)
+            new_tour[a], new_tour[b] = new_tour[b], new_tour[a]
+
         return new_tour
 
     # -------------------------------------
@@ -119,7 +154,7 @@ if __name__ == "__main__":
     from heuristics import ConstructiveHeuristics
 
     N = 40
-    num_iteracoes = 10  # ← você pode alterar aqui
+    num_iteracoes =20 # ← você pode alterar aqui
 
     tsp = TSP()
     heur = ConstructiveHeuristics()
@@ -130,11 +165,11 @@ if __name__ == "__main__":
 
 
     #Selecionar qual heurística construtiva usar
-    tour_nn = heur.cheapest_insertion(D)
+    tour_nn = heur.farthest_insertion(D)
     cost_nn = heur.tour_length(tour_nn, D)
     print(f"Custo inicial (NN): {cost_nn:.2f}")
 
-    # Aplicar busca iterada (3-opt com perturbação)
+    # Aplicar busca iterada
     tour_final, cost_final = improver.iterated_improvement(
         tour_nn, D, heuristic="three_opt", num_iteracoes=num_iteracoes
     )
