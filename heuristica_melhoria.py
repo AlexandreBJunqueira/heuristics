@@ -154,9 +154,10 @@ class ImprovementHeuristics:
 if __name__ == "__main__":
     from tsp import TSP
     from heuristics import ConstructiveHeuristics
+    import os
 
     N = 40
-    num_iteracoes =10 # ← você pode alterar aqui
+    num_iteracoes =20 # ← você pode alterar aqui
 
     tsp = TSP()
     heur = ConstructiveHeuristics()
@@ -179,4 +180,27 @@ if __name__ == "__main__":
     print(f"\nCusto final após {num_iteracoes} iterações: {cost_final:.2f}")
     lista_custos.insert(0,round(cost_nn,2))
     print(lista_custos)
+
+
+
+    ###### Plotando gráficos
+
+    x=[i for i in range(len(lista_custos))]
+    y=lista_custos
+
+    import matplotlib.pyplot as plt
+    os.makedirs("imagens_melhoria", exist_ok=True)
+    plt.plot(x, y, marker='o')
+    plt.ylim(0, max(y)*1.05)
+    plt.xlim(0, len(lista_custos))
+    plt.xlabel("Iteração")
+    plt.ylabel("Custo")
+    plt.title("Evolução do custo durante Iterated Improvement")
+    plt.grid(True)
+    filename = os.path.join("imagens_melhoria", "custo_iteracoes.png")
+    plt.tight_layout()
+    plt.savefig(filename, dpi=300)
+    print(f"Gráfico salvo em: {filename}")
+    plt.close()
+
     
