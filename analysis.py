@@ -5,6 +5,7 @@ import csv
 import matplotlib.pyplot as plt
 import pandas as pd
 from heuristics import ConstructiveHeuristics
+from heuristica_melhoria import ImprovementHeuristics
 from tsp import TSP
 
 
@@ -12,9 +13,15 @@ class Analysis:
     def __init__(self):
         self.tsp = TSP()
         self.h = ConstructiveHeuristics()
+        self.i = ImprovementHeuristics()
 
         os.makedirs("images", exist_ok=True)
         os.makedirs("data", exist_ok=True)
+
+    def _combine_methods(self, D, construction_method, improvement_method, type):
+        tour = construction_method(D)
+        results = improvement_method(tour, D, heuristic=type, num_iteracoes=10)[:2]
+        return results[0], results[1]
 
     # -----------------------------
     # 1) Visualização
@@ -36,6 +43,7 @@ class Analysis:
         points = self.tsp.generate_cities(n, seed)
         D = self.tsp.build_distance_matrix(points, True)
         h = self.h
+        i = self.i
         results = []
 
         # -----------------------------
@@ -59,15 +67,24 @@ class Analysis:
         # -----------------------------
         methods = {
             "Nearest Neighbor": h.nearest_neighbor,
-            "Cheapest Insertion": h.cheapest_insertion,
-            "Farthest Insertion": h.farthest_insertion
+            "Nearest Neighbor + 2-opt": [h.nearest_neighbor, i.iterated_improvement, 'two_opt'],
+            "Nearest Neighbor + 3-opt": [h.nearest_neighbor, i.iterated_improvement, 'three_opt'],
+            # "Cheapest Insertion": h.cheapest_insertion,
+            # "Cheapest Insertion + 2-opt": [h.cheapest_insertion, i.iterated_improvement, 'two_opt'],
+            # "Cheapest Insertion + 3-opt": [h.cheapest_insertion, i.iterated_improvement, 'three_opt'],
+            # "Farthest Insertion": h.farthest_insertion,
+            # "Farthest Insertion + 2-opt": [h.farthest_insertion, i.iterated_improvement, 'two_opt'],
+            # "Farthest Insertion + 3-opt": [h.farthest_insertion, i.iterated_improvement, 'three_opt'],
         }
 
         for name, func in methods.items():
             t0 = time.time()
-            tour = func(D)
+            if isinstance(func, list):
+                tour, cost = self._combine_methods(D, *func)
+            else:
+                tour = func(D)
+                cost = h.tour_length(tour, D)
             t1 = time.time()
-            cost = h.tour_length(tour, D)
 
             if cost_opt is not None:
                 gap = 100 * (cost - cost_opt) / cost_opt
@@ -180,10 +197,10 @@ if __name__ == "__main__":
     analysis = Analysis()
 
     # # Exemplo 1: Rodar experimentos (sem Gurobi)
-    # analysis.run_experiments(n_min=2, n_max=250, seed=42, use_gurobi=False)
+    # analysis.run_experiments(n_min=2, n_max=100, seed=42, use_gurobi=False)
 
     # # Exemplo 2: Rodar experimentos com Gurobi
-    # analysis.run_experiments(n_min=2, n_max=20, seed=42, use_gurobi=True)
+    # analysis.run_experiments(n_min=2, n_max=100, seed=42, use_gurobi=True)
 
     # Exemplo 3: Gerar gráficos de médias e evolução a partir do CSV
     analysis.plot_average_bars()
