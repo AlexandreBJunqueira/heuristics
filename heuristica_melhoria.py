@@ -69,7 +69,7 @@ class ImprovementHeuristics:
     # -------------------------------------
     # 3) Pequena perturbação aleatória
     # -------------------------------------
-    """ def perturbation(self, tour: List[int]) -> List[int]:
+    def perturbation(self, tour: List[int]) -> List[int]:
         new_tour = tour[:]
         n = len(new_tour)
         i, j = sorted(random.sample(range(1, n - 1), 2))
@@ -80,14 +80,14 @@ class ImprovementHeuristics:
             for _ in range(3):  # faz múltiplas trocas aleatórias
                 a, b = random.sample(range(1, n - 1), 2)
                 new_tour[a], new_tour[b] = new_tour[b], new_tour[a]
-        return new_tour """
+        return new_tour
     
 
-    def perturbation(self, tour: List[int]) -> List[int]:
-        """
-        Gera uma perturbação moderada/forte para escapar de ótimos locais.
-        Combina reversões, remoções e reinserções aleatórias de cidades.
-        """
+    """ def perturbation(self, tour: List[int]) -> List[int]:
+        
+        #Gera uma perturbação moderada/forte para escapar de ótimos locais.
+        #Combina reversões, remoções e reinserções aleatórias de cidades.
+        
         new_tour = tour[:]
         n = len(new_tour)
 
@@ -115,7 +115,7 @@ class ImprovementHeuristics:
             a, b = random.sample(range(1, n - 1), 2)
             new_tour[a], new_tour[b] = new_tour[b], new_tour[a]
 
-        return new_tour
+        return new_tour """
 
     # -------------------------------------
     # 4) Iterated Local Search (heurística + perturbação)
@@ -170,11 +170,11 @@ if __name__ == "__main__":
     #Selecionar qual heurística construtiva usar
     tour_nn = heur.nearest_neighbor(D)
     cost_nn = heur.tour_length(tour_nn, D)
-    print(f"Custo inicial (NN): {cost_nn:.2f}")
+    print(f"Custo inicial: {cost_nn:.2f}")
 
     # Aplicar busca iterada
     tour_final, cost_final ,lista_custos = improver.iterated_improvement(
-        tour_nn, D, heuristic="two_opt", num_iteracoes=num_iteracoes
+        tour_nn, D, heuristic="three_opt", num_iteracoes=num_iteracoes
     )
 
     print(f"\nCusto final após {num_iteracoes} iterações: {cost_final:.2f}")
@@ -188,16 +188,22 @@ if __name__ == "__main__":
     x=[i for i in range(len(lista_custos))]
     y=lista_custos
 
+    #linha vermelha de limite de convergência
+    x_2=[i for i in range(len(lista_custos))]
+    y_2 = [493.37] * len(lista_custos)
+
+
     import matplotlib.pyplot as plt
     os.makedirs("imagens_melhoria", exist_ok=True)
     plt.plot(x, y, marker='o')
+    plt.plot(x_2, y_2, linestyle='--', color='red', label='Custo Ótimo') #custo ótimo - alterar se mudar o TSP
     plt.ylim(0, max(y)*1.05)
     plt.xlim(0, len(lista_custos))
     plt.xlabel("Iteração")
     plt.ylabel("Custo")
-    plt.title("Evolução do custo durante Iterated Improvement")
+    plt.title("Nearest Neighbor e iterações de 3-opt")
     plt.grid(True)
-    filename = os.path.join("imagens_melhoria", "custo_iteracoes.png")
+    filename = os.path.join("imagens_melhoria", "nearest neighbor e 3opt.png")
     plt.tight_layout()
     plt.savefig(filename, dpi=300)
     print(f"Gráfico salvo em: {filename}")
