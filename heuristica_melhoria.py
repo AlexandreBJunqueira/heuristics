@@ -122,6 +122,7 @@ class ImprovementHeuristics:
     # -------------------------------------
     def iterated_improvement(self, tour: List[int], D: List[List[float]], 
                              heuristic: str = "two_opt", num_iteracoes: int = 10) -> Tuple[List[int], float]:
+        BEST_COSTS=[]
         if heuristic not in ["two_opt", "three_opt"]:
             raise ValueError("Heurística deve ser 'two_opt' ou 'three_opt'.")
 
@@ -142,8 +143,9 @@ class ImprovementHeuristics:
             best_tour = self.perturbation(best_tour)
 
             print(f"[Iter {it+1}] Custo atual: {best_cost:.2f}")
+            BEST_COSTS.append(round(best_cost,2))
 
-        return best_tour, best_cost
+        return best_tour, best_cost, BEST_COSTS
 
 
 # -------------------------------------
@@ -154,7 +156,7 @@ if __name__ == "__main__":
     from heuristics import ConstructiveHeuristics
 
     N = 40
-    num_iteracoes =20 # ← você pode alterar aqui
+    num_iteracoes =10 # ← você pode alterar aqui
 
     tsp = TSP()
     heur = ConstructiveHeuristics()
@@ -165,13 +167,16 @@ if __name__ == "__main__":
 
 
     #Selecionar qual heurística construtiva usar
-    tour_nn = heur.farthest_insertion(D)
+    tour_nn = heur.nearest_neighbor(D)
     cost_nn = heur.tour_length(tour_nn, D)
     print(f"Custo inicial (NN): {cost_nn:.2f}")
 
     # Aplicar busca iterada
-    tour_final, cost_final = improver.iterated_improvement(
-        tour_nn, D, heuristic="three_opt", num_iteracoes=num_iteracoes
+    tour_final, cost_final ,lista_custos = improver.iterated_improvement(
+        tour_nn, D, heuristic="two_opt", num_iteracoes=num_iteracoes
     )
 
     print(f"\nCusto final após {num_iteracoes} iterações: {cost_final:.2f}")
+    lista_custos.insert(0,round(cost_nn,2))
+    print(lista_custos)
+    
