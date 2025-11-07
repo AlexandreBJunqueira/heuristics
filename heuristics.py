@@ -152,7 +152,7 @@ class ImprovementHeuristics:
     # -------------------------------------
     # 3) Lin-Kernighan simplificado (usa 2-opt e 3-opt)
     # -------------------------------------
-    def lin_kernighan(self, tour: List[int], D: List[List[float]], max_iter: int = 50) -> Tuple[List[int], float, List[float]]:
+    def lin_kernighan(self, tour: List[int], D: List[List[float]], num_iteracoes: int = 50, *args, **kwargs) -> Tuple[List[int], float, List[float]]:
         """
         Versão simplificada do Lin-Kernighan para melhoria de tour.
 
@@ -168,7 +168,7 @@ class ImprovementHeuristics:
         best_cost = self.tour_length(best_tour, D)
         history = [best_cost]
 
-        for it in range(max_iter):
+        for it in range(num_iteracoes):
             improved = False
 
             # 1) tenta 2-opt (melhorias locais rápidas)
@@ -273,7 +273,7 @@ class ImprovementHeuristics:
             # Pequena perturbação para escapar de ótimo local
             best_tour = self.perturbation(best_tour)
 
-            print(f"[Iter {it+1}] Custo atual: {best_cost:.2f}")
+            # print(f"[Iter {it+1}] Custo atual: {best_cost:.2f}")
             BEST_COSTS.append(round(best_cost,2))
 
         return best_tour, best_cost, BEST_COSTS
