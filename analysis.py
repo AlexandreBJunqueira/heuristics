@@ -25,13 +25,32 @@ class Analysis:
     # -----------------------------
     # 1) Visualização
     # -----------------------------
-    def plot_tour(self, points, tour, title, ax):
+    def plot_tour(self, points, tour, title):
+        # Cria pasta se não existir
+        os.makedirs("images", exist_ok=True)
+
+        # Cria figura e eixo
+        fig, ax = plt.subplots(figsize=(6, 6))
+
         xs = [points[i][0] for i in tour]
         ys = [points[i][1] for i in tour]
+
+        # Plota o ciclo
         ax.plot(xs, ys, '-o')
         ax.set_title(title)
         ax.set_xlabel("x")
         ax.set_ylabel("y")
+
+        # Destaca o ponto inicial
+        x0, y0 = xs[0], ys[0]
+        ax.scatter(x0, y0, s=120, color='red', edgecolors='black', zorder=5, label="Start")
+
+        ax.legend()
+
+        # Salva a imagem
+        filepath = f"images/{title.replace(' ', '_')}.png"
+        fig.savefig(filepath, dpi=300, bbox_inches='tight')
+        plt.close(fig)
 
     # -----------------------------
     # 2) Comparação única (para um n)
@@ -201,6 +220,6 @@ if __name__ == "__main__":
     # # Exemplo 2: Rodar experimentos com Gurobi
     # analysis.run_experiments(n_min=2, n_max=100, seed=42, use_gurobi=True)
 
-    # Exemplo 3: Gerar gráficos de médias e evolução a partir do CSV
-    analysis.plot_average_bars()
-    analysis.plot_evolution()
+    # # Exemplo 3: Gerar gráficos de médias e evolução a partir do CSV
+    # analysis.plot_average_bars()
+    # analysis.plot_evolution()

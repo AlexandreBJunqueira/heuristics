@@ -235,14 +235,16 @@ class ImprovementHeuristics:
 # -----------------------------
 if __name__ == "__main__":
     from tsp import TSP
+    from analysis import Analysis
     N = 20
-    constructive_heuristics, tsp = ConstructiveHeuristics(), TSP()
+    constructive_heuristics, tsp, analysis = ConstructiveHeuristics(), TSP(), Analysis()
     cities = tsp.generate_cities(N)
     D = tsp.build_distance_matrix(cities, True)
 
     # Heurística 1: Nearest Neighbor
     tour_nn = constructive_heuristics.nearest_neighbor(D, start=0)
     cost_nn = constructive_heuristics.tour_length(tour_nn, D)
+    analysis.plot_tour(cities, tour_nn, 'Nearest Neighbor')
     print("Nearest Neighbor:")
     print(f"Rota: {tour_nn}")
     print(f"Custo: {cost_nn:.2f}\n")
@@ -250,13 +252,15 @@ if __name__ == "__main__":
     # Heurística 2: Cheapest Insertion
     tour_ci = constructive_heuristics.cheapest_insertion(D)
     cost_ci = constructive_heuristics.tour_length(tour_ci, D)
+    analysis.plot_tour(cities, tour_ci, 'Cheapest Insertion')
     print("Cheapest Insertion:")
     print(f"Rota: {tour_ci}")
     print(f"Custo: {cost_ci:.2f}\n")
 
     # Heurística 3: Farthest Insertion
-    tour_ci = constructive_heuristics.farthest_insertion(D)
-    cost_ci = constructive_heuristics.tour_length(tour_ci, D)
+    tour_fi = constructive_heuristics.farthest_insertion(D)
+    cost_fi = constructive_heuristics.tour_length(tour_fi, D)
+    analysis.plot_tour(cities, tour_fi, 'Farthest Insertion')
     print("Farthest Insertion:")
-    print(f"Rota: {tour_ci}")
-    print(f"Custo: {cost_ci:.2f}\n")
+    print(f"Rota: {tour_fi}")
+    print(f"Custo: {cost_fi:.2f}\n")
