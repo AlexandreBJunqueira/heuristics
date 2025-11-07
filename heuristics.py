@@ -150,6 +150,51 @@ class ImprovementHeuristics:
         return best_tour, best_cost
 
     # -------------------------------------
+    # 3) Lin-Kernighan simplificado (usa 2-opt e 3-opt)
+    # -------------------------------------
+    def lin_kernighan(self, tour: List[int], D: List[List[float]], max_iter: int = 50) -> Tuple[List[int], float, List[float]]:
+        """
+        Versão simplificada do Lin-Kernighan para melhoria de tour.
+
+        Estratégia:
+        - Iterativamente tenta melhorar o tour aplicando 2-opt e, se não houver
+          melhoria, tenta 3-opt. Repete até não haver melhorias ou atingir
+          max_iter iterações.
+
+        Retorna (melhor_tour, melhor_custo, historico_de_costs)
+        """
+        n = len(tour)
+        best_tour = tour[:]
+        best_cost = self.tour_length(best_tour, D)
+        history = [best_cost]
+
+        for it in range(max_iter):
+            improved = False
+
+            # 1) tenta 2-opt (melhorias locais rápidas)
+            new_tour, new_cost = self.two_opt(best_tour, D)
+            if new_cost < best_cost - 1e-9:
+                best_tour, best_cost = new_tour, new_cost
+                history.append(best_cost)
+                improved = True
+                # volta ao começo para procurar mais melhorias a partir do novo tour
+                continue
+
+            # 2) se não houve melhoria com 2-opt, tenta 3-opt (mais potência)
+            new_tour, new_cost = self.three_opt(best_tour, D)
+            if new_cost < best_cost - 1e-9:
+                best_tour, best_cost = new_tour, new_cost
+                history.append(best_cost)
+                improved = True
+                continue
+
+            # 3) nenhuma melhoria por 2-opt/3-opt: encerra
+            if not improved:
+                break
+
+        return best_tour, best_cost, history
+
+    # -------------------------------------
     # 3) Pequena perturbação aleatória
     # -------------------------------------
     def perturbation(self, tour: List[int]) -> List[int]:
@@ -204,10 +249,11 @@ class ImprovementHeuristics:
     # 4) Iterated Local Search (heurística + perturbação)
     # -------------------------------------
     def iterated_improvement(self, tour: List[int], D: List[List[float]], 
-                             heuristic: str = "two_opt", num_iteracoes: int = 10) -> Tuple[List[int], float]:
-        BEST_COSTS=[]
-        if heuristic not in ["two_opt", "three_opt"]:
-            raise ValueError("Heurística deve ser 'two_opt' ou 'three_opt'.")
+                             heuristic: str = "two_opt", num_iteracoes: int = 10,
+                             lin_kernighan_max_iter: int = 50) -> Tuple[List[int], float, List[float]]:
+        BEST_COSTS = []
+        if heuristic not in ["two_opt", "three_opt", "lin_kernighan"]:
+            raise ValueError("Heurística deve ser 'two_opt', 'three_opt' ou 'lin_kernighan'.")
 
         best_tour = tour[:]
         best_cost = self.tour_length(best_tour, D)
@@ -215,8 +261,10 @@ class ImprovementHeuristics:
         for it in range(num_iteracoes):
             if heuristic == "two_opt":
                 improved_tour, improved_cost = self.two_opt(best_tour, D)
-            else:
+            elif heuristic == "three_opt":
                 improved_tour, improved_cost = self.three_opt(best_tour, D)
+            else:  # lin_kernighan
+                improved_tour, improved_cost, _history = self.lin_kernighan(best_tour, D, max_iter=lin_kernighan_max_iter)
 
             # Atualiza se melhorou
             if improved_cost < best_cost:
