@@ -87,15 +87,15 @@ class Analysis:
             "Nearest Neighbor": h.nearest_neighbor,
             "Nearest Neighbor + 2-opt": [h.nearest_neighbor, i.iterated_improvement, 'two_opt'],
             "Nearest Neighbor + 3-opt": [h.nearest_neighbor, i.iterated_improvement, 'three_opt'],
-            "Nearest Neighbor + Lin-Kernighan": [h.nearest_neighbor, i.lin_kernighan, 'three_opt'],
-            # "Cheapest Insertion": h.cheapest_insertion,
-            # "Cheapest Insertion + 2-opt": [h.cheapest_insertion, i.iterated_improvement, 'two_opt'],
-            # "Cheapest Insertion + 3-opt": [h.cheapest_insertion, i.iterated_improvement, 'three_opt'],
-            # "Cheapest Insertion + Lin-Kernighan": [h.nearest_neighbor, i.lin_kernighan, ''],
-            # "Farthest Insertion": h.farthest_insertion,
-            # "Farthest Insertion + 2-opt": [h.farthest_insertion, i.iterated_improvement, 'two_opt'],
-            # "Farthest Insertion + 3-opt": [h.farthest_insertion, i.iterated_improvement, 'three_opt'],
-            # "Farthest Insertion + Lin-Kernighan": [h.nearest_neighbor, i.lin_kernighan, ''],
+            "Nearest Neighbor + Lin-Kernighan": [h.nearest_neighbor, i.lin_kernighan, 'two_opt'],
+            "Cheapest Insertion": h.cheapest_insertion,
+            "Cheapest Insertion + 2-opt": [h.cheapest_insertion, i.iterated_improvement, 'two_opt'],
+            "Cheapest Insertion + 3-opt": [h.cheapest_insertion, i.iterated_improvement, 'three_opt'],
+            "Cheapest Insertion + Lin-Kernighan": [h.cheapest_insertion, i.lin_kernighan, 'two_opt'],
+            "Farthest Insertion": h.farthest_insertion,
+            "Farthest Insertion + 2-opt": [h.farthest_insertion, i.iterated_improvement, 'two_opt'],
+            "Farthest Insertion + 3-opt": [h.farthest_insertion, i.iterated_improvement, 'three_opt'],
+            "Farthest Insertion + Lin-Kernighan": [h.farthest_insertion, i.lin_kernighan, 'two_opt'],
         }
 
         for name, func in methods.items():
@@ -177,7 +177,7 @@ class Analysis:
         ax[1].set_title("Tempo médio (s)")
         ax[2].set_title("Gap médio (%)")
         for a in ax:
-            a.tick_params(axis='x', rotation=15)
+            a.tick_params(axis='x', rotation=90)
         plt.suptitle("Médias das heurísticas construtivas")
         plt.tight_layout()
         plt.savefig("images/average_bars.png", dpi=300)
@@ -193,14 +193,16 @@ class Analysis:
 
         fig, axs = plt.subplots(1, 3, figsize=(16, 4))
         metrics = ["Custo", "Tempo (s)", "Gap (%)"]
-        colors = ["#007acc", "#2ca02c", "#ff7f0e"]
+        # colors = ["#007acc", "#2ca02c", "#ff7f0e"]
 
         for k, metric in enumerate(metrics):
             for i, hname in enumerate(heuristics):
                 sub = df[df["Método"] == hname].groupby("n")[metric].mean().reset_index()
-                axs[k].plot(sub["n"], sub[metric], label=hname, color=colors[i % len(colors)], linewidth=2)
+                #axs[k].plot(sub["n"], sub[metric], label=hname, color=colors[i % len(colors)], linewidth=2)
+                axs[k].plot(sub["n"], sub[metric], label=hname, linewidth=2)
             axs[k].set_title(metric)
             axs[k].set_xlabel("Número de cidades (n)")
+            axs[k].tick_params(axis='x', rotation=90)
             axs[k].grid(True)
             if metric == "Gap (%)":
                 axs[k].legend()
@@ -218,7 +220,7 @@ if __name__ == "__main__":
     analysis = Analysis()
 
     # Exemplo 1: Rodar experimentos (sem Gurobi)
-    analysis.run_experiments(n_min=2, n_max=50, seed=42, use_gurobi=False)
+    analysis.run_experiments(n_min=2, n_max=75, seed=42, use_gurobi=False)
 
     # # Exemplo 2: Rodar experimentos com Gurobi
     # analysis.run_experiments(n_min=2, n_max=100, seed=42, use_gurobi=True)
